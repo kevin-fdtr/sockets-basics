@@ -1,12 +1,15 @@
 var socket = io();
-//var moment = require('moment.js');
+var name = getQueryVariable('name') || 'Anonymous';
+var room = getQueryVariable('room') || 'Main';
 
 socket.on('connect', function() {
   console.log('connected to socket.io server');
 });
 
 socket.on('message', function(message) {
-  jQuery('.messages').append('<p><strong>' + moment.utc(message.time).local().format('h:mm:ss a') + ':</strong> ' + message.text + '</p>');
+  var $message = jQuery('.messages');
+  $message.append('<p><strong>' + message.name + ' ' + moment.utc(message.time).local().format('h:mm a') + ':</strong></p>');
+  $message.append('<p>' + message.text + '</p>');
 });
 
 // Handles submitting of new message
@@ -18,6 +21,7 @@ $form.on('submit', function (event) {
   var $message = $form.find('input[name=message]');
 
   socket.emit('message', {
+    name: name,
     text: $message.val(),
     time: moment().valueOf()
   });
